@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>SI / NO</title>
+
+<style>
+
+body{
+    font-family:Arial;
+    background:#f3f4f6;
+    margin:30px;
+}
+
+h1{
+    text-align:center;
+}
+
+.formulario{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-bottom:30px;
+}
+
+input{
+    width:300px;
+    padding:10px;
+}
+
+button{
+    padding:10px 20px;
+    cursor:pointer;
+}
+
+.columnas{
+    display:flex;
+    gap:40px;
+}
+
+.columna{
+    flex:1;
+    background:white;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 0 10px rgba(0,0,0,.1);
+}
+
+.columna h2{
+    text-align:center;
+}
+
+.item{
+    display:flex;
+    justify-content:space-between;
+    margin:8px 0;
+    padding:8px;
+    background:#eee;
+    border-radius:5px;
+}
+
+.item button{
+    padding:3px 8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Lista SI / NO</h1>
+
+<div class="formulario">
+
+<input id="texto" placeholder="Escribe algo">
+
+<label>
+<input type="radio" name="tipo" value="si" checked>
+SI
+</label>
+
+<label>
+<input type="radio" name="tipo" value="no">
+NO
+</label>
+
+<button onclick="agregar()">Añadir</button>
+
+</div>
+
+<div class="columnas">
+
+<div class="columna">
+
+<h2>✅ SI</h2>
+
+<div id="listaSi"></div>
+
+</div>
+
+<div class="columna">
+
+<h2>❌ NO</h2>
+
+<div id="listaNo"></div>
+
+</div>
+
+</div>
+
+<script>
+
+let datos = JSON.parse(localStorage.getItem("datos")) || [];
+
+function guardar(){
+    localStorage.setItem("datos",JSON.stringify(datos));
+}
+
+function render(){
+
+document.getElementById("listaSi").innerHTML="";
+document.getElementById("listaNo").innerHTML="";
+
+datos.forEach((item,i)=>{
+
+let div=document.createElement("div");
+div.className="item";
+
+div.innerHTML=`
+<span>${item.texto}</span>
+<button onclick="borrar(${i})">🗑</button>
+`;
+
+if(item.tipo=="si")
+document.getElementById("listaSi").appendChild(div);
+else
+document.getElementById("listaNo").appendChild(div);
+
+});
+
+}
+
+function agregar(){
+
+let texto=document.getElementById("texto").value.trim();
+
+if(texto=="") return;
+
+let tipo=document.querySelector("input[name='tipo']:checked").value;
+
+datos.push({
+texto,
+tipo
+});
+
+guardar();
+render();
+
+document.getElementById("texto").value="";
+
+}
+
+function borrar(i){
+
+datos.splice(i,1);
+
+guardar();
+
+render();
+
+}
+
+render();
+
+</script>
+
+</body>
+</html>
