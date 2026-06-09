@@ -1,180 +1,497 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>SI / NO</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Listas SI / NO</title>
 
 <style>
-
-body{
-    font-family:Arial;
-    background:#f3f4f6;
-    margin:30px;
+:root {
+  --bg: #12091d;
+  --panel: rgba(255,255,255,.08);
+  --panel2: rgba(255,255,255,.12);
+  --text: #f5edff;
+  --muted: #b9a8ce;
+  --yes: #3ef2a3;
+  --no: #ff5c7c;
+  --accent: #9b4dff;
 }
 
-h1{
-    text-align:center;
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, Arial, sans-serif;
+  background:
+    radial-gradient(circle at top left, #4b158f, transparent 35%),
+    radial-gradient(circle at bottom right, #b21870, transparent 30%),
+    var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 24px;
 }
 
-.formulario{
-    display:flex;
-    gap:10px;
-    justify-content:center;
-    margin-bottom:30px;
+.app {
+  max-width: 1100px;
+  margin: auto;
 }
 
-input{
-    width:300px;
-    padding:10px;
+header {
+  text-align: center;
+  margin-bottom: 24px;
 }
 
-button{
-    padding:10px 20px;
-    cursor:pointer;
+h1 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  margin: 0;
 }
 
-.columnas{
-    display:flex;
-    gap:40px;
+p {
+  color: var(--muted);
 }
 
-.columna{
-    flex:1;
-    background:white;
-    border-radius:10px;
-    padding:20px;
-    box-shadow:0 0 10px rgba(0,0,0,.1);
+.card {
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,.15);
+  backdrop-filter: blur(16px);
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.35);
 }
 
-.columna h2{
-    text-align:center;
+.controls {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
-.item{
-    display:flex;
-    justify-content:space-between;
-    margin:8px 0;
-    padding:8px;
-    background:#eee;
-    border-radius:5px;
+input, select, button {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 15px;
 }
 
-.item button{
-    padding:3px 8px;
+input, select {
+  background: rgba(255,255,255,.12);
+  color: var(--text);
+  outline: none;
 }
 
+select option {
+  color: #111;
+}
+
+button {
+  background: linear-gradient(135deg, var(--accent), #e638b9);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .15s ease, opacity .15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button.secondary {
+  background: rgba(255,255,255,.14);
+}
+
+button.danger {
+  background: linear-gradient(135deg, #ff315f, #a3002b);
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.column {
+  min-height: 320px;
+}
+
+.column h2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0;
+}
+
+.badge {
+  background: rgba(255,255,255,.14);
+  color: var(--muted);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 14px;
+}
+
+.list {
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item {
+  background: var(--panel2);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 8px;
+  align-items: center;
+  cursor: grab;
+}
+
+.item span {
+  word-break: break-word;
+}
+
+.item button {
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+
+.empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 30px;
+  border: 1px dashed rgba(255,255,255,.2);
+  border-radius: 16px;
+}
+
+.yes-title { color: var(--yes); }
+.no-title { color: var(--no); }
+
+.drag-over {
+  outline: 2px dashed var(--accent);
+  outline-offset: 6px;
+}
+
+@media (max-width: 800px) {
+  .controls, .topbar, .columns {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
-
 </head>
 
 <body>
+<div class="app">
+  <header>
+    <h1>SI / NO</h1>
+    <p>Una pequeña fábrica de decisiones con dos columnas y cero drama.</p>
+  </header>
 
-<h1>Lista SI / NO</h1>
+  <section class="card">
+    <div class="topbar">
+      <select id="listaActual"></select>
+      <input id="nuevaLista" placeholder="Nombre de nueva lista..." />
+      <button onclick="crearLista()">Crear lista</button>
+      <button class="danger" onclick="borrarLista()">Borrar lista</button>
+    </div>
 
-<div class="formulario">
+    <div class="controls">
+      <input id="texto" placeholder="Escribe algo..." />
+      <select id="tipo">
+        <option value="si">SI</option>
+        <option value="no">NO</option>
+      </select>
+      <button onclick="agregar()">Añadir</button>
+      <button class="secondary" onclick="limpiarTodo()">Vaciar</button>
+    </div>
 
-<input id="texto" placeholder="Escribe algo">
+    <div class="topbar">
+      <input id="buscar" placeholder="Buscar..." oninput="render()" />
+      <button class="secondary" onclick="exportar()">Exportar JSON</button>
+      <input type="file" id="importarArchivo" accept=".json" onchange="importar(event)" />
+      <button class="secondary" onclick="descargarTXT()">Descargar TXT</button>
+    </div>
 
-<label>
-<input type="radio" name="tipo" value="si" checked>
-SI
-</label>
+    <div class="columns">
+      <div class="card column" ondragover="permitirDrop(event)" ondrop="soltar(event, 'si')" id="col-si">
+        <h2 class="yes-title">✅ SI <span class="badge" id="countSi">0</span></h2>
+        <div class="list" id="listaSi"></div>
+      </div>
 
-<label>
-<input type="radio" name="tipo" value="no">
-NO
-</label>
-
-<button onclick="agregar()">Añadir</button>
-
-</div>
-
-<div class="columnas">
-
-<div class="columna">
-
-<h2>✅ SI</h2>
-
-<div id="listaSi"></div>
-
-</div>
-
-<div class="columna">
-
-<h2>❌ NO</h2>
-
-<div id="listaNo"></div>
-
-</div>
-
+      <div class="card column" ondragover="permitirDrop(event)" ondrop="soltar(event, 'no')" id="col-no">
+        <h2 class="no-title">❌ NO <span class="badge" id="countNo">0</span></h2>
+        <div class="list" id="listaNo"></div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <script>
+let app = JSON.parse(localStorage.getItem("siNoApp")) || {
+  actual: "General",
+  listas: {
+    General: []
+  }
+};
 
-let datos = JSON.parse(localStorage.getItem("datos")) || [];
-
-function guardar(){
-    localStorage.setItem("datos",JSON.stringify(datos));
+function guardar() {
+  localStorage.setItem("siNoApp", JSON.stringify(app));
 }
 
-function render(){
+function getLista() {
+  return app.listas[app.actual];
+}
 
-document.getElementById("listaSi").innerHTML="";
-document.getElementById("listaNo").innerHTML="";
+function renderSelector() {
+  const select = document.getElementById("listaActual");
+  select.innerHTML = "";
 
-datos.forEach((item,i)=>{
+  Object.keys(app.listas).forEach(nombre => {
+    const option = document.createElement("option");
+    option.value = nombre;
+    option.textContent = nombre;
+    if (nombre === app.actual) option.selected = true;
+    select.appendChild(option);
+  });
+}
 
-let div=document.createElement("div");
-div.className="item";
-
-div.innerHTML=`
-<span>${item.texto}</span>
-<button onclick="borrar(${i})">🗑</button>
-`;
-
-if(item.tipo=="si")
-document.getElementById("listaSi").appendChild(div);
-else
-document.getElementById("listaNo").appendChild(div);
-
+document.getElementById("listaActual").addEventListener("change", e => {
+  app.actual = e.target.value;
+  guardar();
+  render();
 });
 
+function agregar() {
+  const input = document.getElementById("texto");
+  const texto = input.value.trim();
+  const tipo = document.getElementById("tipo").value;
+
+  if (!texto) return;
+
+  getLista().push({
+    id: crypto.randomUUID(),
+    texto,
+    tipo,
+    fecha: new Date().toISOString()
+  });
+
+  input.value = "";
+  guardar();
+  render();
 }
 
-function agregar(){
-
-let texto=document.getElementById("texto").value.trim();
-
-if(texto=="") return;
-
-let tipo=document.querySelector("input[name='tipo']:checked").value;
-
-datos.push({
-texto,
-tipo
+document.getElementById("texto").addEventListener("keydown", e => {
+  if (e.key === "Enter") agregar();
 });
 
-guardar();
-render();
-
-document.getElementById("texto").value="";
-
+function borrar(id) {
+  app.listas[app.actual] = getLista().filter(item => item.id !== id);
+  guardar();
+  render();
 }
 
-function borrar(i){
+function editar(id) {
+  const item = getLista().find(i => i.id === id);
+  const nuevo = prompt("Editar texto:", item.texto);
 
-datos.splice(i,1);
+  if (nuevo === null) return;
+  if (!nuevo.trim()) return;
 
-guardar();
+  item.texto = nuevo.trim();
+  guardar();
+  render();
+}
 
-render();
+function mover(id) {
+  const item = getLista().find(i => i.id === id);
+  item.tipo = item.tipo === "si" ? "no" : "si";
+  guardar();
+  render();
+}
 
+function render() {
+  renderSelector();
+
+  const listaSi = document.getElementById("listaSi");
+  const listaNo = document.getElementById("listaNo");
+  const filtro = document.getElementById("buscar").value.toLowerCase();
+
+  listaSi.innerHTML = "";
+  listaNo.innerHTML = "";
+
+  const datos = getLista().filter(item =>
+    item.texto.toLowerCase().includes(filtro)
+  );
+
+  const si = datos.filter(i => i.tipo === "si");
+  const no = datos.filter(i => i.tipo === "no");
+
+  document.getElementById("countSi").textContent = si.length;
+  document.getElementById("countNo").textContent = no.length;
+
+  pintar(si, listaSi);
+  pintar(no, listaNo);
+
+  if (!si.length) listaSi.innerHTML = `<div class="empty">Nada en SI todavía.</div>`;
+  if (!no.length) listaNo.innerHTML = `<div class="empty">Nada en NO todavía.</div>`;
+}
+
+function pintar(items, contenedor) {
+  items.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.draggable = true;
+    div.ondragstart = e => e.dataTransfer.setData("id", item.id);
+
+    div.innerHTML = `
+      <span>${escaparHTML(item.texto)}</span>
+      <button class="secondary" onclick="editar('${item.id}')">✏️</button>
+      <button class="secondary" onclick="mover('${item.id}')">↔️</button>
+      <button class="danger" onclick="borrar('${item.id}')">🗑️</button>
+    `;
+
+    contenedor.appendChild(div);
+  });
+}
+
+function permitirDrop(e) {
+  e.preventDefault();
+}
+
+function soltar(e, tipo) {
+  e.preventDefault();
+  const id = e.dataTransfer.getData("id");
+  const item = getLista().find(i => i.id === id);
+
+  if (item) {
+    item.tipo = tipo;
+    guardar();
+    render();
+  }
+}
+
+function crearLista() {
+  const input = document.getElementById("nuevaLista");
+  const nombre = input.value.trim();
+
+  if (!nombre) return;
+  if (app.listas[nombre]) {
+    alert("Esa lista ya existe.");
+    return;
+  }
+
+  app.listas[nombre] = [];
+  app.actual = nombre;
+  input.value = "";
+  guardar();
+  render();
+}
+
+function borrarLista() {
+  if (app.actual === "General") {
+    alert("No puedes borrar la lista General.");
+    return;
+  }
+
+  if (!confirm(`¿Borrar la lista "${app.actual}"?`)) return;
+
+  delete app.listas[app.actual];
+  app.actual = "General";
+  guardar();
+  render();
+}
+
+function limpiarTodo() {
+  if (!confirm("¿Vaciar esta lista?")) return;
+
+  app.listas[app.actual] = [];
+  guardar();
+  render();
+}
+
+function exportar() {
+  const blob = new Blob([JSON.stringify(app, null, 2)], {
+    type: "application/json"
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = "listas-si-no.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+function importar(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+
+      if (!data.listas || !data.actual) {
+        alert("Archivo no válido.");
+        return;
+      }
+
+      app = data;
+      guardar();
+      render();
+    } catch {
+      alert("No se pudo importar el archivo.");
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+function descargarTXT() {
+  const si = getLista().filter(i => i.tipo === "si").map(i => `SI - ${i.texto}`);
+  const no = getLista().filter(i => i.tipo === "no").map(i => `NO - ${i.texto}`);
+
+  const contenido = [
+    `Lista: ${app.actual}`,
+    "",
+    "=== SI ===",
+    ...si,
+    "",
+    "=== NO ===",
+    ...no
+  ].join("\n");
+
+  const blob = new Blob([contenido], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = `${app.actual}-si-no.txt`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+function escaparHTML(texto) {
+  return texto
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 render();
-
 </script>
-
 </body>
 </html>
